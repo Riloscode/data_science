@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 from category_encoders import LeaveOneOutEncoder
 from sklearn.model_selection import train_test_split, GridSearchCV
+import tensorflow as tf
 
 df = pd.read_csv('data_science/data_lake/Mental_Health_Dataset.csv')
 
@@ -42,3 +43,19 @@ X = data.drop(data.iloc[:, -3:], axis=1)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle=True, random_state=42)
 print(y.head())
 print(X.head())
+
+# Define the logistic regression model
+model = tf.keras.models.Sequential([
+  tf.keras.layers.Dense(128, input_shape=(X_train.shape[1],), activation='relu'),
+  tf.keras.layers.Dense(64, activation='relu'),
+  tf.keras.layers.Dense(y_train.shape[1], activation='sigmoid')  # Adjust the output layer to match the number of target variables
+])
+
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+# Train the model
+history = model.fit(X_train, y_train, epochs=5, verbose=0)
+
+# Evaluate the model
+loss, accuracy = model.evaluate(X_test, y_test)
+print('Accuracy: ', accuracy)
